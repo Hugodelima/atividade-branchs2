@@ -176,15 +176,7 @@ function App() {
       
       
 
-      {accounts.map((account) => (
-        <section key={account.id}>
-          <span>{account.nameBank} - {account.agency} - {account.account} - Saldo: R$ {account.balance}</span>
-          <button onClick={() => handleDelete(account.id)}>Remover</button>
-          <button onClick={() => handleEdit(account)}>Editar</button>
-          <button onClick={() => deposit(account.id, 100)}>Depositar R$ 100</button>
-          <button onClick={() => withdraw(account.id, 50)}>Sacar R$ 50</button>
-        </section>
-      ))}
+      
     </div>
   );
 }
