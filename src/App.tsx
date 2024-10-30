@@ -152,9 +152,7 @@ function App() {
         placeholder="Digite o saldo"
       />
 
-      <button onClick={handleRegister}>
-        {editMode.enabled ? 'Alterar Conta' : 'Cadastrar Conta'}
-      </button>
+      
 
       <hr />
       <Button onClick={handleOpen}>Open modal</Button>
