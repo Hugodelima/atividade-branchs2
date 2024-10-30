@@ -89,6 +89,7 @@ function App() {
     setNameBank('')
     setNumberAgency('')
     setNumberAccount('')
+    setNumberBalance('')
     setEditMode({ enabled: false, account: null })
   }
 
