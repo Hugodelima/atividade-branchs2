@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-
 import * as React from 'react';
 
 import './App.css';
@@ -19,9 +18,9 @@ interface Account {
 
 function App() {
   const [nameBank, setNameBank] = useState('');
-  const [numberAgency, setNumberAgency] = useState('');
-  const [numberAccount, setNumberAccount] = useState('');
-  const [numberBalance, setNumberBalance] = useState('')
+  const [numberAgency, setNumberAgency] = useState<number | ''>(''); // Alterado para permitir número ou string vazia
+  const [numberAccount, setNumberAccount] = useState<number | ''>(''); // Alterado para permitir número ou string vazia
+  const [numberBalance, setNumberBalance] = useState<number | ''>(''); // Alterado para permitir número ou string vazia
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [editMode, setEditMode] = useState<{ enabled: boolean; account: Account | null }>({
     enabled: false,
@@ -40,17 +39,17 @@ function App() {
   }, []);
 
   function handleRegister() {
-    if (!nameBank || !numberAgency || !numberAccount || !numberBalance) {
-      alert('Por favor, preencha todos os campos solicitados')
+    if (!nameBank || numberAgency === '' || numberAccount === '' || numberBalance === '') {
+      alert('Por favor, preencha todos os campos solicitados');
       return;
     }
 
     const newAccount: Account = {
-      id: (editMode.enabled ? editMode.account?.id : Date.now()),
+      id: editMode.enabled ? editMode.account?.id : Date.now(),
       nameBank,
-      agency: parseInt(numberAgency),
-      account: parseInt(numberAccount),
-      balance: parseFloat(numberBalance),
+      agency: Number(numberAgency),
+      account: Number(numberAccount),
+      balance: Number(numberBalance),
     };
 
     if (editMode.enabled && editMode.account) {
@@ -79,17 +78,20 @@ function App() {
   }
 
   function handleSaveEdit(updatedAccount: Account) {
-    const updatedAccounts = accounts.map(account => (account.id === updatedAccount.id ? updatedAccount : account));
+    const updatedAccounts = accounts.map(account =>
+      account.id === updatedAccount.id ? updatedAccount : account
+    );
     setAccounts(updatedAccounts);
     localStorage.setItem('accounts', JSON.stringify(updatedAccounts));
     resetForm();
   }
 
   function resetForm() {
-    setNameBank('')
-    setNumberAgency('')
-    setNumberAccount('')
-    setEditMode({ enabled: false, account: null })
+    setNameBank('');
+    setNumberAgency('');
+    setNumberAccount('');
+    setNumberBalance('');
+    setEditMode({ enabled: false, account: null });
   }
 
   function deposit(id: number, amount: number) {
@@ -109,7 +111,7 @@ function App() {
         if (account.balance >= amount) {
           account.balance -= amount;
         } else {
-          alert("Saldo insuficiente!");
+          alert('Saldo insuficiente!');
         }
       }
       return account;
@@ -120,7 +122,6 @@ function App() {
 
   return (
     <div>
-
       <h1>Gerenciamento de Conta Bancária</h1>
 
       <input
@@ -132,26 +133,24 @@ function App() {
 
       <input
         type="number"
-        value={numberAgency}
-        onChange={(e) => setNumberAgency(e.target.value)}
+        value={numberAgency !== '' ? numberAgency : ''}
+        onChange={(e) => setNumberAgency(Number(e.target.value))}
         placeholder="Número da Agência"
       />
 
       <input
         type="number"
-        value={numberAccount}
-        onChange={(e) => setNumberAccount(e.target.value)}
+        value={numberAccount !== '' ? numberAccount : ''}
+        onChange={(e) => setNumberAccount(Number(e.target.value))}
         placeholder="Número da Conta"
       />
 
       <input
         type="number"
-        value={numberBalance}
-        onChange={(e) => setNumberBalance(e.target.value)}
+        value={numberBalance !== '' ? numberBalance : ''}
+        onChange={(e) => setNumberBalance(Number(e.target.value))}
         placeholder="Digite o saldo"
       />
-
-      
 
       <hr />
       <Button onClick={handleOpen}>Open modal</Button>
@@ -165,16 +164,11 @@ function App() {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Text in a modal
           </Typography>
-          <h2>fdsfdgfdg</h2>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </Typography>
         </Box>
       </Modal>
-      
-      
-
-      
     </div>
   );
 }
