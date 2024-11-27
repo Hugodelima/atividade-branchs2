@@ -18,9 +18,9 @@ interface Account {
 
 function App() {
   const [nameBank, setNameBank] = useState('');
-  const [numberAgency, setNumberAgency] = useState<number | ''>(''); // Alterado para permitir número ou string vazia
-  const [numberAccount, setNumberAccount] = useState<number | ''>(''); // Alterado para permitir número ou string vazia
-  const [numberBalance, setNumberBalance] = useState<number | ''>(''); // Alterado para permitir número ou string vazia
+  const [numberAgency, setNumberAgency] = useState<string>('');
+  const [numberAccount, setNumberAccount] = useState<string>('');
+  const [numberBalance, setNumberBalance] = useState<string>('');
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [editMode, setEditMode] = useState<{ enabled: boolean; account: Account | null }>({
     enabled: false,
@@ -39,7 +39,7 @@ function App() {
   }, []);
 
   function handleRegister() {
-    if (!nameBank || numberAgency === '' || numberAccount === '' || numberBalance === '') {
+    if (!nameBank || !numberAgency || !numberAccount || !numberBalance) {
       alert('Por favor, preencha todos os campos solicitados');
       return;
     }
@@ -64,6 +64,7 @@ function App() {
   }
 
   function handleDelete(id: number | undefined) {
+    if (id === undefined) return;
     const updatedAccounts = accounts.filter(account => account.id !== id);
     setAccounts(updatedAccounts);
     localStorage.setItem('accounts', JSON.stringify(updatedAccounts));
@@ -71,14 +72,14 @@ function App() {
 
   function handleEdit(account: Account) {
     setNameBank(account.nameBank);
-    setNumberAgency(account.agency);
-    setNumberAccount(account.account);
-    setNumberBalance(account.balance);
+    setNumberAgency(account.agency.toString());
+    setNumberAccount(account.account.toString());
+    setNumberBalance(account.balance.toString());
     setEditMode({ enabled: true, account });
   }
 
   function handleSaveEdit(updatedAccount: Account) {
-    const updatedAccounts = accounts.map(account =>
+    const updatedAccounts = accounts.map(account => 
       account.id === updatedAccount.id ? updatedAccount : account
     );
     setAccounts(updatedAccounts);
@@ -94,7 +95,8 @@ function App() {
     setEditMode({ enabled: false, account: null });
   }
 
-  function deposit(id: number, amount: number) {
+  function deposit(id: number | undefined, amount: number) {
+    if (id === undefined) return;
     const updatedAccounts = accounts.map(account => {
       if (account.id === id) {
         account.balance += amount;
@@ -105,7 +107,8 @@ function App() {
     localStorage.setItem('accounts', JSON.stringify(updatedAccounts));
   }
 
-  function withdraw(id: number, amount: number) {
+  function withdraw(id: number | undefined, amount: number) {
+    if (id === undefined) return;
     const updatedAccounts = accounts.map(account => {
       if (account.id === id) {
         if (account.balance >= amount) {
@@ -132,28 +135,43 @@ function App() {
       />
 
       <input
-        type="number"
-        value={numberAgency !== '' ? numberAgency : ''}
-        onChange={(e) => setNumberAgency(Number(e.target.value))}
+        type="text"
+        value={numberAgency}
+        onChange={(e) => setNumberAgency(e.target.value)}
         placeholder="Número da Agência"
       />
 
       <input
-        type="number"
-        value={numberAccount !== '' ? numberAccount : ''}
-        onChange={(e) => setNumberAccount(Number(e.target.value))}
+        type="text"
+        value={numberAccount}
+        onChange={(e) => setNumberAccount(e.target.value)}
         placeholder="Número da Conta"
       />
 
       <input
-        type="number"
-        value={numberBalance !== '' ? numberBalance : ''}
-        onChange={(e) => setNumberBalance(Number(e.target.value))}
+        type="text"
+        value={numberBalance}
+        onChange={(e) => setNumberBalance(e.target.value)}
         placeholder="Digite o saldo"
       />
 
+      <Button onClick={handleRegister}>
+        {editMode.enabled ? 'Salvar Alterações' : 'Registrar Conta'}
+      </Button>
+
       <hr />
-      <Button onClick={handleOpen}>Open modal</Button>
+      {accounts.map(account => (
+        <div key={account.id}>
+          <p>
+            Banco: {account.nameBank}, Agência: {account.agency}, Conta: {account.account}, Saldo: {account.balance}
+          </p>
+          <Button onClick={() => handleEdit(account)}>Editar</Button>
+          <Button onClick={() => handleDelete(account.id)}>Deletar</Button>
+          <Button onClick={() => deposit(account.id, 50)}>Depositar 50</Button>
+          <Button onClick={() => withdraw(account.id, 50)}>Sacar 50</Button>
+        </div>
+      ))}
+
       <Modal
         open={open}
         onClose={handleClose}
@@ -162,10 +180,10 @@ function App() {
       >
         <Box className="box-modal">
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
+            Modal Title
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+            Informações do modal.
           </Typography>
         </Box>
       </Modal>
